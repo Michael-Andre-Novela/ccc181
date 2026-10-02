@@ -1,7 +1,7 @@
 # Git Exercises
 
 **Course:** CCC181  
-**Student Name:** Novela, Michael Andre L.
+**Student Name:** Novela, Michael Andre L.  
 **Student ID:** 20241328
 
 ## Activity Description
