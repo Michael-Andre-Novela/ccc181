@@ -101,25 +101,34 @@ def join():
             "status": "waiting",
         }
     )
-    flash(f"You joined the queue. Your ticket number is #{number}.", "success")
+    flash(f"You joined the queue. Your ticket is #{number}.", "success")
     return redirect(url_for("ticket", ticket_id=number))
 
 
-@app.route("/queue/<int:ticket_id>")
+@app.get("/queue/<int:ticket_id>")
 def ticket(ticket_id):
     t = next((x for x in TICKETS if x["number"] == ticket_id), None)
     if t is None:
         abort(404)
 
-    ahead_count = sum(
-        1
-        for x in TICKETS
+    ahead = [
+        x for x in TICKETS
         if x["service_id"] == t["service_id"]
         and x["status"] == "waiting"
         and x["number"] < t["number"]
-    )
+    ]
     service = next((s for s in SERVICES if s["id"] == t["service_id"]), {"name": "General Bag Drop"})
-    return render_template("ticket.html", ticket=t, service=service, ahead=ahead_count)
+    return render_template("ticket.html", ticket=t, service=service, ahead=len(ahead))
+
+
+@app.post("/queue/<int:ticket_id>/leave")
+def leave_queue(ticket_id):
+    t = next((x for x in TICKETS if x["number"] == ticket_id), None)
+    if t is None:
+        abort(404)
+    t["status"] = "no-show"
+    flash("You have left the queue.", "info")
+    return redirect(url_for("index"))
 
 
 @app.route("/staff")

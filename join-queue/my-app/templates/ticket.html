@@ -1,9 +1,95 @@
 {% extends "base.html" %}
-
-{% block title %}Ticket #{{ ticket.number }} · NAIA ExpressPass: Terminal 3 Queue Management System{% endblock %}
+{% block title %}Ticket #{{ ticket.number }} · NAIA ExpressPass{% endblock %}
 
 {% block content %}
-  <h2>Ticket #{{ ticket.number }}</h2>
-  <p>Hi {{ ticket.name }}! You are <strong>number {{ position }}</strong> in the queue.</p>
-  <p><a href="{{ url_for('index') }}">&larr; Back to the queue</a></p>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+    
+    <!-- Location Strip -->
+    <div class="d-flex justify-content-between align-items-center p-2 px-3 bg-white rounded-3 border mb-3 small fw-semibold">
+      <span><i class="bi bi-geo-alt me-1"></i> TERMINAL 3 · DEPARTURE HALL</span>
+      <span class="text-success"><i class="bi bi-check-circle-fill me-1"></i> BAGS ACTIVE</span>
+    </div>
+
+    <!-- Main Ticket Card -->
+    <div class="card shadow-sm border-0 mb-3 rounded-3">
+      <div class="card-body p-4">
+        
+        <!-- Live Status Wrapper (Target for Part 8 Polling) -->
+        <div id="live-status" aria-live="polite">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <small class="text-uppercase fw-bold text-muted">Ticket Number</small>
+            {% if ticket.status == 'waiting' %}
+              <span class="badge text-bg-warning px-3 py-2 fs-6">Waiting</span>
+            {% elif ticket.status == 'called' %}
+              <span class="badge text-bg-primary px-3 py-2 fs-6">Called</span>
+            {% elif ticket.status == 'served' %}
+              <span class="badge text-bg-success px-3 py-2 fs-6">Served</span>
+            {% else %}
+              <span class="badge text-bg-secondary px-3 py-2 fs-6">No-show</span>
+            {% endif %}
+          </div>
+
+          <!-- Big Ticket Display -->
+          <div class="display-1 fw-bold text-dark my-1">
+            #{{ ticket.number }}
+          </div>
+          <div class="fw-bold text-primary mb-3">Service: {{ service.name }}</div>
+
+          <!-- Queue Position Indicator -->
+          <div class="alert alert-info border-0 rounded-3 my-3">
+            <div class="h5 mb-0 fw-bold">
+              {% if ahead == 0 %}
+                You're next!
+              {% else %}
+                {{ ahead }} {% if ahead == 1 %}person{% else %}people{% endif %} ahead of you
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Assigned Counter Callout -->
+        <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <div class="small text-uppercase text-muted fw-bold">Designated Point</div>
+            <div class="fw-bold mb-0">Assigned to: Counter 4 (Opposite Pillar 7)</div>
+          </div>
+        </div>
+
+        <!-- Ticket Flight Metadata -->
+        <div class="row g-2 p-3 bg-white border rounded-3 small mb-3">
+          <div class="col-6">
+            <span class="text-muted d-block">Passenger</span>
+            <strong class="fw-bold">{{ ticket.name }}</strong>
+          </div>
+          <div class="col-6">
+            <span class="text-muted d-block">Flight</span>
+            <strong class="fw-bold">{{ ticket.flight_number }}</strong>
+          </div>
+          <div class="col-6">
+            <span class="text-muted d-block">PNR</span>
+            <strong class="fw-bold">{{ ticket.pnr }}</strong>
+          </div>
+          <div class="col-6">
+            <span class="text-muted d-block">Bags</span>
+            <strong class="fw-bold">{{ ticket.num_bags }} Units</strong>
+          </div>
+          <div class="col-12 border-top pt-2 mt-1 d-flex justify-content-between align-items-center">
+            <span>Slot Window: <strong>{{ ticket.slot_time }}</strong></span>
+            <span class="badge bg-success-subtle text-success border border-success-subtle">On Schedule</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Leave Queue Form -->
+    <form method="post" action="{{ url_for('leave_queue', ticket_id=ticket.number) }}">
+      <button type="submit" class="btn btn-outline-danger w-100 py-2 rounded-3">
+        Leave the queue
+      </button>
+    </form>
+
+  </div>
+</div>
 {% endblock %}
