@@ -4,10 +4,10 @@ Run it with:
     flask --app app run --debug
 then open http://127.0.0.1:5000
 """
-from flask import Flask, abort, redirect, render_template, request, url_for
+from flask import Flask, abort, flash, redirect, render_template, request, url_for
 
 app = Flask(__name__)
-
+app.secret_key = "dev-only-change-me"  # Week 11 moves this into an environment variable
 # Sample data for the demo. It lives in memory, so it resets every time the
 # server restarts. A real app would save tickets in a database later.
 SERVICES = [
@@ -66,40 +66,79 @@ TICKETS = [
 
 @app.route("/")
 def index():
-    # render_template looks inside the templates/ folder and passes
-    # keyword arguments to the template as variables.
-    return render_template("index.html", name="Ana", tickets=TICKETS)
+    return render_template("index.html")
+
+
+@app.get("/join")
+def join_form():
+    return render_template("join.html", services=SERVICES, form={}, errors={})
+
+
+@app.post("/join")
+def join():
+    form = request.form
+    name = form.get("name", "").strip()
+    email = form.get("email", "").strip().lower()
+    flight_number = form.get("flight_number", "").strip().upper()
+    pnr = form.get("pnr", "").strip().upper()
+    num_bags = form.get("num_bags", type=int)
+    service_id = form.get("service_id", type=int)
+    slot_time = form.get("slot_time", "14:15 - 14:30").strip()
+
+    errors = {}
+    if not name:
+        errors["name"] = "Enter your full name."
+    if "@" not in email or "." not in email:
+        errors["email"] = "Enter a valid email address."
+    if not flight_number:
+        errors["flight_number"] = "Enter your flight number (e.g., 5J-501)."
+    if not pnr or len(pnr) != 6:
+        errors["pnr"] = "PNR reference must be exactly 6 characters."
+    if not num_bags or num_bags < 1 or num_bags > 5:
+        errors["num_bags"] = "Specify between 1 and 5 bags."
+    if service_id not in [s["id"] for s in SERVICES]:
+        errors["service_id"] = "Choose a valid bag drop service lane."
+
+    if errors:
+        flash("Please fix the highlighted errors below.", "danger")
+        return render_template("join.html", services=SERVICES, form=form, errors=errors), 400
+
+    new_number = max((t["number"] for t in TICKETS), default=0) + 1
+    new_ticket = {
+        "number": new_number,
+        "name": name,
+        "email": email,
+        "service_id": service_id,
+        "flight_number": flight_number,
+        "pnr": pnr,
+        "num_bags": num_bags,
+        "slot_time": slot_time,
+        "status": "waiting",
+    }
+    TICKETS.append(new_ticket)
+    flash(f"Success! Ticket A-{new_number:03d} generated.", "success")
+    return redirect(url_for("ticket", ticket_id=new_number))
 
 
 @app.route("/queue/<int:ticket_id>")
 def ticket(ticket_id):
-    # <int:ticket_id> only matches numbers, so /queue/abc returns 404.
-    for position, t in enumerate(TICKETS, start=1):
-        if t["number"] == ticket_id:
-            return render_template("ticket.html", ticket=t, position=position)
-    abort(404)  # no ticket with that number
+    t = next((x for x in TICKETS if x["number"] == ticket_id), None)
+    if t is None:
+        abort(404)
+
+    ahead_count = sum(
+        1 for x in TICKETS
+        if x["service_id"] == t["service_id"]
+        and x["status"] == "waiting"
+        and x["number"] < t["number"]
+    )
+    service = next((s for s in SERVICES if s["id"] == t["service_id"]), {"name": "General Bag Drop"})
+    return render_template("ticket.html", ticket=t, service=service, ahead=ahead_count)
 
 
-@app.route("/join", methods=["GET", "POST"])
-def join():
-    # GET: show the empty form. POST: the form was submitted.
-    if request.method == "POST":
-        name = request.form.get("name", "").strip()
-        if not name:
-            return render_template("join.html", error="Please enter your name.")
-
-        number = TICKETS[-1]["number"] + 1 if TICKETS else 1
-        TICKETS.append({"number": number, "name": name})
-        # Redirect after POST so refreshing the page doesn't join twice.
-        return redirect(url_for("ticket", ticket_id=number))
-
-    return render_template("join.html")
-
-
-@app.route("/hello")
-def hello():
-    # The plain-string version from the Routes slide.
-    return "Hello, CCC181!"
+@app.route("/staff")
+def staff_dashboard():
+    return "Staff dashboard coming soon"
 
 
 if __name__ == "__main__":

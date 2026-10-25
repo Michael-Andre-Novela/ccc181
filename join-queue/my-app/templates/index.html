@@ -1,16 +1,14 @@
 {% extends "base.html" %}
+{% block title %}Home · NAIA ExpressPass{% endblock %}
 
 {% block content %}
-  <p>Hello, {{ name }}!</p>
-
-  <p><a class="button" href="{{ url_for('join') }}">Join the queue</a></p>
-
-  <h2>Tickets in the queue</h2>
-  <ul class="tickets">
-    {% for t in tickets %}
-      <li><a href="{{ url_for('ticket', ticket_id=t.number) }}">#{{ t.number }}</a> {{ t.name }}</li>
-    {% else %}
-      <li>The queue is empty.</li>
-    {% endfor %}
-  </ul>
+<div class="text-center py-5">
+  <h1 class="display-4 fw-bold">NAIA ExpressPass</h1>
+  <p class="lead my-3">
+    Reserve your airport baggage drop slot and check your place in line live from your phone.
+  </p>
+  <p class="mt-4">
+    <a href="{{ url_for('join_form') }}" class="btn btn-primary btn-lg">Join the queue</a>
+  </p>
+</div>
 {% endblock %}
