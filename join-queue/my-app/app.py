@@ -131,9 +131,64 @@ def leave_queue(ticket_id):
     return redirect(url_for("index"))
 
 
-@app.route("/staff")
+@app.get("/staff")
 def staff_dashboard():
-    return "Staff dashboard coming soon"
+    service_id = request.args.get("service_id", type=int)
+    queue = [t for t in TICKETS if t["status"] in ("waiting", "called")]
+    if service_id:
+        queue = [t for t in queue if t["service_id"] == service_id]
+
+    names = {s["id"]: s["name"] for s in SERVICES}
+
+    # ★ Setting-specific feature: Waiting counts per service lane
+    counts = {
+        s["id"]: sum(1 for t in TICKETS if t["service_id"] == s["id"] and t["status"] == "waiting")
+        for s in SERVICES
+    }
+
+    first_waiting = next((t for t in queue if t["status"] == "waiting"), None)
+
+    return render_template(
+        "staff.html",
+        queue=queue,
+        services=SERVICES,
+        names=names,
+        selected=service_id,
+        counts=counts,
+        first_waiting=first_waiting,
+    )
+
+
+@app.post("/staff/call-next")
+def call_next():
+    service_id = request.args.get("service_id", type=int)
+    waiting = [t for t in TICKETS if t["status"] == "waiting"]
+    if service_id:
+        waiting = [t for t in waiting if t["service_id"] == service_id]
+
+    if waiting:
+        first = waiting[0]
+        first["status"] = "called"
+        flash(f"Ticket #{first['number']} marked called.", "info")
+    else:
+        flash("No passengers currently waiting in queue.", "warning")
+
+    return redirect(url_for("staff_dashboard", service_id=service_id if service_id else None))
+
+
+@app.post("/staff/tickets/<int:ticket_id>/<action>")
+def staff_action(ticket_id, action):
+    new_status = {"call": "called", "serve": "served", "no-show": "no-show"}.get(action)
+    t = next((t for t in TICKETS if t["number"] == ticket_id), None)
+    if t is None or new_status is None:
+        abort(404)
+
+    t["status"] = new_status
+    flash(f"Ticket #{ticket_id} marked {new_status}.", "info")
+    
+    # Maintain existing service_id filter if present in query parameters
+    service_id = request.args.get("service_id", type=int)
+    return redirect(url_for("staff_dashboard", service_id=service_id if service_id else None))
 
 
 if __name__ == "__main__":
