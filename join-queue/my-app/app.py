@@ -1,6 +1,6 @@
 """CCC181 Week 3: NAIA ExpressPass Queue Management System"""
 
-from flask import Flask, abort, flash, redirect, render_template, request, url_for
+from flask import Flask, abort, flash, jsonify, redirect, render_template, request, url_for
 
 app = Flask(__name__)
 app.secret_key = "dev-only-change-me"
@@ -121,6 +121,20 @@ def ticket(ticket_id):
     return render_template("ticket.html", ticket=t, service=service, ahead=len(ahead))
 
 
+@app.get("/queue/<int:ticket_id>/status.json")
+def ticket_status(ticket_id):
+    t = next((t for t in TICKETS if t["number"] == ticket_id), None)
+    if t is None:
+        abort(404)
+    ahead = sum(
+        1 for x in TICKETS
+        if x["service_id"] == t["service_id"]
+        and x["status"] == "waiting"
+        and x["number"] < t["number"]
+    )
+    return {"status": t["status"], "ahead": ahead}
+
+
 @app.post("/queue/<int:ticket_id>/leave")
 def leave_queue(ticket_id):
     t = next((x for x in TICKETS if x["number"] == ticket_id), None)
@@ -139,13 +153,10 @@ def staff_dashboard():
         queue = [t for t in queue if t["service_id"] == service_id]
 
     names = {s["id"]: s["name"] for s in SERVICES}
-
-    # ★ Setting-specific feature: Waiting counts per service lane
     counts = {
         s["id"]: sum(1 for t in TICKETS if t["service_id"] == s["id"] and t["status"] == "waiting")
         for s in SERVICES
     }
-
     first_waiting = next((t for t in queue if t["status"] == "waiting"), None)
 
     return render_template(
@@ -185,8 +196,7 @@ def staff_action(ticket_id, action):
 
     t["status"] = new_status
     flash(f"Ticket #{ticket_id} marked {new_status}.", "info")
-    
-    # Maintain existing service_id filter if present in query parameters
+
     service_id = request.args.get("service_id", type=int)
     return redirect(url_for("staff_dashboard", service_id=service_id if service_id else None))
 

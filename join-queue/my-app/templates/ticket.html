@@ -15,19 +15,16 @@
     <div class="card shadow-sm border-0 mb-3 rounded-3">
       <div class="card-body p-4">
         
-        <!-- Live Status Wrapper (Target for Part 8 Polling) -->
+        <!-- Live Status Section -->
         <div id="live-status" aria-live="polite">
           <div class="d-flex justify-content-between align-items-start mb-2">
             <small class="text-uppercase fw-bold text-muted">Ticket Number</small>
-            {% if ticket.status == 'waiting' %}
-              <span class="badge text-bg-warning px-3 py-2 fs-6">Waiting</span>
-            {% elif ticket.status == 'called' %}
-              <span class="badge text-bg-primary px-3 py-2 fs-6">Called</span>
-            {% elif ticket.status == 'served' %}
-              <span class="badge text-bg-success px-3 py-2 fs-6">Served</span>
-            {% else %}
-              <span class="badge text-bg-secondary px-3 py-2 fs-6">No-show</span>
-            {% endif %}
+            <span id="status-badge" class="badge {% if ticket.status == 'waiting' %}text-bg-warning{% elif ticket.status == 'called' %}text-bg-primary{% elif ticket.status == 'served' %}text-bg-success{% else %}text-bg-secondary{% endif %} px-3 py-2 fs-6">
+              {% if ticket.status == 'waiting' %}Waiting
+              {% elif ticket.status == 'called' %}Called
+              {% elif ticket.status == 'served' %}Served
+              {% else %}No-show{% endif %}
+            </span>
           </div>
 
           <!-- Big Ticket Display -->
@@ -38,7 +35,7 @@
 
           <!-- Queue Position Indicator -->
           <div class="alert alert-info border-0 rounded-3 my-3">
-            <div class="h5 mb-0 fw-bold">
+            <div id="position-heading" class="h5 mb-0 fw-bold">
               {% if ahead == 0 %}
                 You're next!
               {% else %}
@@ -48,7 +45,7 @@
           </div>
         </div>
 
-        <!-- Assigned Counter Callout -->
+        <!-- Designated Point -->
         <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center mb-3">
           <div>
             <div class="small text-uppercase text-muted fw-bold">Designated Point</div>
@@ -56,7 +53,7 @@
           </div>
         </div>
 
-        <!-- Ticket Flight Metadata -->
+        <!-- Ticket Metadata -->
         <div class="row g-2 p-3 bg-white border rounded-3 small mb-3">
           <div class="col-6">
             <span class="text-muted d-block">Passenger</span>
@@ -92,4 +89,46 @@
 
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const statusUrl = "{{ url_for('ticket_status', ticket_id=ticket.number) }}";
+
+  async function refreshStatus() {
+    try {
+      const res = await fetch(statusUrl);
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const statusBadge = document.getElementById("status-badge");
+      const positionHeading = document.getElementById("position-heading");
+
+      if (statusBadge) {
+        statusBadge.textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+        if (data.status === "waiting") {
+          statusBadge.className = "badge text-bg-warning px-3 py-2 fs-6";
+        } else if (data.status === "called") {
+          statusBadge.className = "badge text-bg-primary px-3 py-2 fs-6";
+        } else if (data.status === "served") {
+          statusBadge.className = "badge text-bg-success px-3 py-2 fs-6";
+        } else {
+          statusBadge.className = "badge text-bg-secondary px-3 py-2 fs-6";
+        }
+      }
+
+      if (positionHeading) {
+        if (data.ahead === 0) {
+          positionHeading.textContent = "You're next!";
+        } else {
+          positionHeading.textContent = `${data.ahead} ${data.ahead === 1 ? 'person' : 'people'} ahead of you`;
+        }
+      }
+    } catch (err) {
+      console.warn("Could not refresh status", err);
+    }
+  }
+
+  setInterval(refreshStatus, 10000);
+</script>
 {% endblock %}
