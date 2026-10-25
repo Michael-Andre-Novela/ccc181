@@ -1,20 +1,103 @@
 {% extends "base.html" %}
-
-{% block title %}Join the queue · NAIA ExpressPass: Terminal 3 Queue Management System{% endblock %}
+{% block title %}Join the queue · NAIA ExpressPass{% endblock %}
 
 {% block content %}
-  <h2>Join the queue</h2>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+    <h1 class="h3 mb-1">Join the Bag Drop Queue</h1>
+    <p class="text-secondary small mb-4">NAIA Terminal 3 — Departure Hall</p>
 
-  {% if error %}
-    <p class="error">{{ error }}</p>
-  {% endif %}
+    <form method="post" action="{{ url_for('join') }}" novalidate id="join-form">
+      
+      <!-- Name -->
+      <div class="mb-3">
+        <label for="name" class="form-label">Full name</label>
+        <input id="name" name="name" type="text" autocomplete="name" required
+               class="form-control {% if errors and errors.name %}is-invalid{% endif %}"
+               value="{{ form.get('name', '') }}"
+               {% if errors and errors.name %}aria-describedby="name-error"{% endif %}>
+        {% if errors and errors.name %}
+          <div id="name-error" class="invalid-feedback">{{ errors.name }}</div>
+        {% endif %}
+      </div>
 
-  {# method="post" sends the form to the same URL as a POST request #}
-  <form method="post" class="join-form">
-    <label for="name">Your name</label>
-    <input id="name" name="name" type="text" autofocus>
-    <button type="submit">Get a ticket</button>
-  </form>
+      <!-- Email -->
+      <div class="mb-3">
+        <label for="email" class="form-label">Email address</label>
+        <input id="email" name="email" type="email" autocomplete="email" required
+               class="form-control {% if errors and errors.email %}is-invalid{% endif %}"
+               value="{{ form.get('email', '') }}"
+               {% if errors and errors.email %}aria-describedby="email-error"{% endif %}>
+        {% if errors and errors.email %}
+          <div id="email-error" class="invalid-feedback">{{ errors.email }}</div>
+        {% endif %}
+      </div>
 
-  <p><a href="{{ url_for('index') }}">&larr; Back to the queue</a></p>
+      <!-- Flight Number & PNR Row -->
+      <div class="row g-2 mb-3">
+        <div class="col-6">
+          <label for="flight_number" class="form-label">Flight number</label>
+          <input id="flight_number" name="flight_number" type="text" placeholder="e.g., 5J-501" required
+                 class="form-control {% if errors and errors.flight_number %}is-invalid{% endif %}"
+                 value="{{ form.get('flight_number', '') }}"
+                 {% if errors and errors.flight_number %}aria-describedby="flight-error"{% endif %}>
+          {% if errors and errors.flight_number %}
+            <div id="flight-error" class="invalid-feedback">{{ errors.flight_number }}</div>
+          {% endif %}
+        </div>
+        <div class="col-6">
+          <label for="pnr" class="form-label">Booking ref (PNR)</label>
+          <input id="pnr" name="pnr" type="text" placeholder="6 chars" required maxlength="6"
+                 class="form-control {% if errors and errors.pnr %}is-invalid{% endif %}"
+                 value="{{ form.get('pnr', '') }}"
+                 {% if errors and errors.pnr %}aria-describedby="pnr-error"{% endif %}>
+          {% if errors and errors.pnr %}
+            <div id="pnr-error" class="invalid-feedback">{{ errors.pnr }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Number of Bags -->
+      <div class="mb-3">
+        <label for="num_bags" class="form-label">Number of checked bags</label>
+        <input id="num_bags" name="num_bags" type="number" min="1" max="5" required
+               class="form-control {% if errors and errors.num_bags %}is-invalid{% endif %}"
+               value="{{ form.get('num_bags', 2) }}"
+               {% if errors and errors.num_bags %}aria-describedby="bags-error"{% endif %}>
+        {% if errors and errors.num_bags %}
+          <div id="bags-error" class="invalid-feedback">{{ errors.num_bags }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Service Selection -->
+      <div class="mb-3">
+        <label for="service_id" class="form-label">Service</label>
+        <select id="service_id" name="service_id" required
+                class="form-select {% if errors and errors.service_id %}is-invalid{% endif %}"
+                {% if errors and errors.service_id %}aria-describedby="service-error"{% endif %}>
+          <option value="">Choose a service…</option>
+          {% for s in services %}
+            <option value="{{ s.id }}"
+              {% if form.get('service_id') == s.id|string %}selected{% endif %}>{{ s.name }}</option>
+          {% endfor %}
+        </select>
+        {% if errors and errors.service_id %}
+          <div id="service-error" class="invalid-feedback">{{ errors.service_id }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Preferred Slot Window -->
+      <div class="mb-4">
+        <label for="slot_time" class="form-label">Preferred slot window</label>
+        <select id="slot_time" name="slot_time" class="form-select">
+          <option value="14:15 - 14:30" {% if form.get('slot_time') == '14:15 - 14:30' %}selected{% endif %}>14:15 - 14:30 (Estimated wait: 2 mins)</option>
+          <option value="14:30 - 14:45" {% if form.get('slot_time') == '14:30 - 14:45' %}selected{% endif %}>14:30 - 14:45 (Estimated wait: 5 mins)</option>
+          <option value="14:45 - 15:00" {% if form.get('slot_time') == '14:45 - 15:00' %}selected{% endif %}>14:45 - 15:00 (Estimated wait: 10 mins)</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Get a ticket</button>
+    </form>
+  </div>
+</div>
 {% endblock %}

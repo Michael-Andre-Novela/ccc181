@@ -1,15 +1,10 @@
-"""CCC181 Week 2: a "Hello, Flask" starter app.
+"""CCC181 Week 3: NAIA ExpressPass Queue Management System"""
 
-Run it with:
-    flask --app app run --debug
-then open http://127.0.0.1:5000
-"""
 from flask import Flask, abort, flash, redirect, render_template, request, url_for
 
 app = Flask(__name__)
-app.secret_key = "dev-only-change-me"  # Week 11 moves this into an environment variable
-# Sample data for the demo. It lives in memory, so it resets every time the
-# server restarts. A real app would save tickets in a database later.
+app.secret_key = "dev-only-change-me"
+
 SERVICES = [
     {"id": 1, "name": "Virtual Slot Drop-off (Pre-booked)"},
     {"id": 2, "name": "Priority Lane (OFW / Senior / PWD / Infant)"},
@@ -50,17 +45,6 @@ TICKETS = [
         "slot_time": "Walk-in",
         "status": "called",
     },
-    {
-        "number": 4,
-        "name": "Elena Torres",
-        "email": "elena.t@gmail.com",
-        "service_id": 1,
-        "flight_number": "5J-501",
-        "pnr": "M4N5O6",
-        "num_bags": 2,
-        "slot_time": "14:30 - 14:45",
-        "status": "served",
-    },
 ]
 
 
@@ -93,31 +77,32 @@ def join():
     if not flight_number:
         errors["flight_number"] = "Enter your flight number (e.g., 5J-501)."
     if not pnr or len(pnr) != 6:
-        errors["pnr"] = "PNR reference must be exactly 6 characters."
+        errors["pnr"] = "Booking reference (PNR) must be exactly 6 characters."
     if not num_bags or num_bags < 1 or num_bags > 5:
         errors["num_bags"] = "Specify between 1 and 5 bags."
     if service_id not in [s["id"] for s in SERVICES]:
-        errors["service_id"] = "Choose a valid bag drop service lane."
+        errors["service_id"] = "Choose a service lane."
 
     if errors:
-        flash("Please fix the highlighted errors below.", "danger")
+        flash("Please fix the highlighted fields.", "danger")
         return render_template("join.html", services=SERVICES, form=form, errors=errors), 400
 
-    new_number = max((t["number"] for t in TICKETS), default=0) + 1
-    new_ticket = {
-        "number": new_number,
-        "name": name,
-        "email": email,
-        "service_id": service_id,
-        "flight_number": flight_number,
-        "pnr": pnr,
-        "num_bags": num_bags,
-        "slot_time": slot_time,
-        "status": "waiting",
-    }
-    TICKETS.append(new_ticket)
-    flash(f"Success! Ticket A-{new_number:03d} generated.", "success")
-    return redirect(url_for("ticket", ticket_id=new_number))
+    number = TICKETS[-1]["number"] + 1 if TICKETS else 1
+    TICKETS.append(
+        {
+            "number": number,
+            "name": name,
+            "email": email,
+            "service_id": service_id,
+            "flight_number": flight_number,
+            "pnr": pnr,
+            "num_bags": num_bags,
+            "slot_time": slot_time,
+            "status": "waiting",
+        }
+    )
+    flash(f"You joined the queue. Your ticket number is #{number}.", "success")
+    return redirect(url_for("ticket", ticket_id=number))
 
 
 @app.route("/queue/<int:ticket_id>")
@@ -127,7 +112,8 @@ def ticket(ticket_id):
         abort(404)
 
     ahead_count = sum(
-        1 for x in TICKETS
+        1
+        for x in TICKETS
         if x["service_id"] == t["service_id"]
         and x["status"] == "waiting"
         and x["number"] < t["number"]
@@ -142,5 +128,4 @@ def staff_dashboard():
 
 
 if __name__ == "__main__":
-    # Lets you also start the app with: python app.py
     app.run(debug=True)
