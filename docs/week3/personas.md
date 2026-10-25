@@ -8,7 +8,7 @@
 
 | | |
 | --- | --- |
-| **Photo or sketch** |![Ramon Santos](images/ramon.png) |
+| **Photo or sketch** |![Ramon Santos](screenshots/ramon.png) |
 | **Age, role and background** | 34, Overseas Filipino Worker (OFW) returning to Dubai via Terminal 3. Commutes to NAIA from Cavite via shuttle. *(interview)* |
 | **Goals** | 1. Drop off 2 heavy luggage boxes within a guaranteed time window. <br>2. Avoid standing in a static 2-hour queue before passing through airport security and immigration. |
 | **Frustrations** | 1. Unpredictable wait times causing anxiety about gate closure. <br>2. Crowded waiting areas near Terminal 3 pillars with nowhere to sit or store luggage trolleys. *(observation)* |
@@ -42,7 +42,7 @@ Ramon arrives at NAIA Terminal 3 two and a half hours before his flight to Dubai
 
 | | |
 | --- | --- |
-| **Photo or sketch** | ![Bea Bee](images/bea.png) |
+| **Photo or sketch** | ![Bea Bee](screenshots/bea.png) |
 | **Age, role and background** | 26, Ground Operations Representative at NAIA Terminal 3 check-in counters. Works 8-hour shifts handling high-volume peak departure rushes. *(interview)* |
 | **Goals** | 1. Process each baggage drop-off in under 90 seconds. <br>2. Quickly identify and prioritize urgent flight queues or special assistance lanes (OFW / Senior / PWD). |
 | **Frustrations** | 1. Passengers coming to the counter out of order or outside their reserved slot times. <br>2. Having to navigate cluttered computer screens while tagging physical baggage items. *(observation)* |
