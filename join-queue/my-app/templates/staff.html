@@ -28,7 +28,55 @@
       </div>
     </div>
   </div>
+<!-- Mobile View Cards -->
+    <div class="d-md-none p-3">
+      {% for t in queue %}
+        <div class="card border mb-3 rounded-3 p-3 {% if t.status == 'called' %}border-primary bg-light{% endif %}">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <span class="fs-4 fw-bold">#{{ t.number }}</span>
+              <span class="ms-2 fw-semibold">{{ t.name }}</span>
+            </div>
+            {% if t.status == 'waiting' %}
+              <span class="badge text-bg-warning">Waiting</span>
+            {% elif t.status == 'called' %}
+              <span class="badge text-bg-primary">Called</span>
+            {% endif %}
+          </div>
 
+          <div class="row g-1 small text-muted mb-3">
+            <div class="col-6">Flight: <strong class="text-dark">{{ t.flight_number }}</strong></div>
+            <div class="col-6">PNR: <strong class="text-dark">{{ t.pnr }}</strong></div>
+            <div class="col-12">Lane: <strong class="text-dark">{{ names.get(t.service_id, 'General') }}</strong></div>
+          </div>
+
+          <!-- Touch-friendly Action Buttons -->
+          <div class="d-flex gap-2">
+            {% if t.status == 'waiting' %}
+              <form method="post" action="{{ url_for('staff_action', ticket_id=t.number, action='call', service_id=selected) }}" class="flex-fill">
+                <button type="submit" class="btn btn-outline-primary w-100 py-2 fw-semibold" aria-label="Call ticket {{ t.number }}">
+                  Call
+                </button>
+              </form>
+            {% endif %}
+
+            <form method="post" action="{{ url_for('staff_action', ticket_id=t.number, action='serve', service_id=selected) }}" class="flex-fill">
+              <button type="submit" class="btn btn-success w-100 py-2 fw-semibold" aria-label="Mark ticket {{ t.number }} as served">
+                Serve
+              </button>
+            </form>
+
+            <form method="post" action="{{ url_for('staff_action', ticket_id=t.number, action='no-show', service_id=selected) }}" class="flex-fill">
+              <button type="submit" class="btn btn-outline-danger w-100 py-2 fw-semibold" aria-label="Mark ticket {{ t.number }} as no-show">
+                No-show
+              </button>
+            </form>
+          </div>
+        </div>
+      {% else %}
+        <p class="text-center text-muted mb-0">No passengers waiting in queue.</p>
+      {% endfor %}
+    </div>
   <!-- Service Filter Nav Pills & Waiting Counts (★ Feature) -->
   <div class="col-12">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 border-bottom pb-3">
