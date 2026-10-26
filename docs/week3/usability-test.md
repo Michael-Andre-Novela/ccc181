@@ -1,6 +1,6 @@
 # Usability Test Report — NAIA ExpressPass
 
-**Tester Profile:** Raven Joy Avenido (3rd-year IT Student) — representing the passenger persona (*Ramon Santos*).  
+**Tester Profile:** Aveni  (3rd-year IT Student) — representing the passenger persona (*Ramon Santos*).  
 **Test Setup:** In-person user observation on a mobile viewport (375 px width) connected via local Wi-Fi (`flask --app app run --debug --host 0.0.0.0`).  
 **Consent:** Explicit permission granted for screen observation and feedback recording.
 
@@ -12,7 +12,7 @@
 * **Did they finish it?** Yes (Unassisted)
 * **Time Taken:** ~18 seconds
 * **Hesitations & Verbal Feedback:** 
-  - Raven tapped **Join Bag Drop Queue** immediately from the landing hero section.
+  - Aveni tapped **Join Bag Drop Queue** immediately from the landing hero section.
   - On `/join`, she paused briefly when selecting between the service lane option cards before picking *Virtual Slot Drop-off*.
   - *Quote:* *"Nakalagay pala na 6 characters yung PNR reference! At least alam ko agad kung anong code kukunin sa flight email ko, diba?"*
 * **Persona Rule Evaluation:** 
@@ -36,7 +36,7 @@
 * **Did they finish it?** Yes (With minor navigation hesitation)
 * **Time Taken:** ~22 seconds
 * **Hesitations & Verbal Feedback:**
-  - On the passenger ticket page, Raven looked for a direct link to the staff portal. She clicked the navbar brand logo to return to the home page, then selected **Staff Dashboard**.
+  - On the passenger ticket page, Aveni looked for a direct link to the staff portal. She clicked the navbar brand logo to return to the home page, then selected **Staff Dashboard**.
   - On `/staff`, she immediately tapped the prominent gold **Call next** button.
   - She then clicked the green **Serve** button on the active passenger row in the intake manifest.
   - *Quote:* *"clear ng 'Call Next' button sa taas! Pero try mo din maglagay ng direct staff link sa footer or navbar para hindi na kailangan bumalik sa home page to test."*
@@ -49,7 +49,7 @@
 ## 10b. One Key Improvement
 
 ### Problem Identified
-During Task 3, Raven experienced navigation friction when trying to switch from the passenger ticket view (`/queue/<id>`) to the staff dashboard (`/staff`). The interface lacked a direct link to the staff portal on inner pages, forcing users to navigate back to the homepage first before accessing counter operations.
+During Task 3, Aveni  experienced navigation friction when trying to switch from the passenger ticket view (`/queue/<id>`) to the staff dashboard (`/staff`). The interface lacked a direct link to the staff portal on inner pages, forcing users to navigate back to the homepage first before accessing counter operations.
 
 ### Applied Fix
 Added a persistent **Staff Portal Quick Link** in the global site footer (`templates/base.html`), enabling ground staff and testers to navigate directly to `/staff` from any screen in 1 click.
