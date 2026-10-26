@@ -49,9 +49,15 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="border-top py-3 text-center text-body-secondary small">
-    NAIA ExpressPass · CCC181
-  </footer>
+  <footer class="border-top py-3 text-center text-body-secondary small mt-auto">
+  <div class="container">
+    <span>© 2026 NAIA ExpressPass · Terminal 3 Departure Operations</span>
+    <span class="mx-2">•</span>
+    <a href="{{ url_for('staff_dashboard') }}" class="text-decoration-none text-secondary fw-semibold">
+      <i class="bi bi-person-badge me-1"></i> Staff Portal Quick Link
+    </a>
+  </div>
+</footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>

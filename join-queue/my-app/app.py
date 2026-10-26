@@ -1,15 +1,10 @@
-"""CCC181 Week 2: a "Hello, Flask" starter app.
+"""CCC181 Week 3: NAIA ExpressPass Queue Management System"""
 
-Run it with:
-    flask --app app run --debug
-then open http://127.0.0.1:5000
-"""
-from flask import Flask, abort, flash, redirect, render_template, request, url_for
+from flask import Flask, abort, flash, jsonify, redirect, render_template, request, url_for
 
 app = Flask(__name__)
-app.secret_key = "dev-only-change-me"  # Week 11 moves this into an environment variable
-# Sample data for the demo. It lives in memory, so it resets every time the
-# server restarts. A real app would save tickets in a database later.
+app.secret_key = "dev-only-change-me"
+
 SERVICES = [
     {"id": 1, "name": "Virtual Slot Drop-off (Pre-booked)"},
     {"id": 2, "name": "Priority Lane (OFW / Senior / PWD / Infant)"},
@@ -50,17 +45,6 @@ TICKETS = [
         "slot_time": "Walk-in",
         "status": "called",
     },
-    {
-        "number": 4,
-        "name": "Elena Torres",
-        "email": "elena.t@gmail.com",
-        "service_id": 1,
-        "flight_number": "5J-501",
-        "pnr": "M4N5O6",
-        "num_bags": 2,
-        "slot_time": "14:30 - 14:45",
-        "status": "served",
-    },
 ]
 
 
@@ -93,54 +77,129 @@ def join():
     if not flight_number:
         errors["flight_number"] = "Enter your flight number (e.g., 5J-501)."
     if not pnr or len(pnr) != 6:
-        errors["pnr"] = "PNR reference must be exactly 6 characters."
+        errors["pnr"] = "Booking reference (PNR) must be exactly 6 characters."
     if not num_bags or num_bags < 1 or num_bags > 5:
         errors["num_bags"] = "Specify between 1 and 5 bags."
     if service_id not in [s["id"] for s in SERVICES]:
-        errors["service_id"] = "Choose a valid bag drop service lane."
+        errors["service_id"] = "Choose a service lane."
 
     if errors:
-        flash("Please fix the highlighted errors below.", "danger")
+        flash("Please fix the highlighted fields.", "danger")
         return render_template("join.html", services=SERVICES, form=form, errors=errors), 400
 
-    new_number = max((t["number"] for t in TICKETS), default=0) + 1
-    new_ticket = {
-        "number": new_number,
-        "name": name,
-        "email": email,
-        "service_id": service_id,
-        "flight_number": flight_number,
-        "pnr": pnr,
-        "num_bags": num_bags,
-        "slot_time": slot_time,
-        "status": "waiting",
-    }
-    TICKETS.append(new_ticket)
-    flash(f"Success! Ticket A-{new_number:03d} generated.", "success")
-    return redirect(url_for("ticket", ticket_id=new_number))
+    number = TICKETS[-1]["number"] + 1 if TICKETS else 1
+    TICKETS.append(
+        {
+            "number": number,
+            "name": name,
+            "email": email,
+            "service_id": service_id,
+            "flight_number": flight_number,
+            "pnr": pnr,
+            "num_bags": num_bags,
+            "slot_time": slot_time,
+            "status": "waiting",
+        }
+    )
+    flash(f"You joined the queue. Your ticket is #{number}.", "success")
+    return redirect(url_for("ticket", ticket_id=number))
 
 
-@app.route("/queue/<int:ticket_id>")
+@app.get("/queue/<int:ticket_id>")
 def ticket(ticket_id):
     t = next((x for x in TICKETS if x["number"] == ticket_id), None)
     if t is None:
         abort(404)
 
-    ahead_count = sum(
+    ahead = [
+        x for x in TICKETS
+        if x["service_id"] == t["service_id"]
+        and x["status"] == "waiting"
+        and x["number"] < t["number"]
+    ]
+    service = next((s for s in SERVICES if s["id"] == t["service_id"]), {"name": "General Bag Drop"})
+    return render_template("ticket.html", ticket=t, service=service, ahead=len(ahead))
+
+
+@app.get("/queue/<int:ticket_id>/status.json")
+def ticket_status(ticket_id):
+    t = next((t for t in TICKETS if t["number"] == ticket_id), None)
+    if t is None:
+        abort(404)
+    ahead = sum(
         1 for x in TICKETS
         if x["service_id"] == t["service_id"]
         and x["status"] == "waiting"
         and x["number"] < t["number"]
     )
-    service = next((s for s in SERVICES if s["id"] == t["service_id"]), {"name": "General Bag Drop"})
-    return render_template("ticket.html", ticket=t, service=service, ahead=ahead_count)
+    return {"status": t["status"], "ahead": ahead}
 
 
-@app.route("/staff")
+@app.post("/queue/<int:ticket_id>/leave")
+def leave_queue(ticket_id):
+    t = next((x for x in TICKETS if x["number"] == ticket_id), None)
+    if t is None:
+        abort(404)
+    t["status"] = "no-show"
+    flash("You have left the queue.", "info")
+    return redirect(url_for("index"))
+
+
+@app.get("/staff")
 def staff_dashboard():
-    return "Staff dashboard coming soon"
+    service_id = request.args.get("service_id", type=int)
+    queue = [t for t in TICKETS if t["status"] in ("waiting", "called")]
+    if service_id:
+        queue = [t for t in queue if t["service_id"] == service_id]
+
+    names = {s["id"]: s["name"] for s in SERVICES}
+    counts = {
+        s["id"]: sum(1 for t in TICKETS if t["service_id"] == s["id"] and t["status"] == "waiting")
+        for s in SERVICES
+    }
+    first_waiting = next((t for t in queue if t["status"] == "waiting"), None)
+
+    return render_template(
+        "staff.html",
+        queue=queue,
+        services=SERVICES,
+        names=names,
+        selected=service_id,
+        counts=counts,
+        first_waiting=first_waiting,
+    )
+
+
+@app.post("/staff/call-next")
+def call_next():
+    service_id = request.args.get("service_id", type=int)
+    waiting = [t for t in TICKETS if t["status"] == "waiting"]
+    if service_id:
+        waiting = [t for t in waiting if t["service_id"] == service_id]
+
+    if waiting:
+        first = waiting[0]
+        first["status"] = "called"
+        flash(f"Ticket #{first['number']} marked called.", "info")
+    else:
+        flash("No passengers currently waiting in queue.", "warning")
+
+    return redirect(url_for("staff_dashboard", service_id=service_id if service_id else None))
+
+
+@app.post("/staff/tickets/<int:ticket_id>/<action>")
+def staff_action(ticket_id, action):
+    new_status = {"call": "called", "serve": "served", "no-show": "no-show"}.get(action)
+    t = next((t for t in TICKETS if t["number"] == ticket_id), None)
+    if t is None or new_status is None:
+        abort(404)
+
+    t["status"] = new_status
+    flash(f"Ticket #{ticket_id} marked {new_status}.", "info")
+
+    service_id = request.args.get("service_id", type=int)
+    return redirect(url_for("staff_dashboard", service_id=service_id if service_id else None))
 
 
 if __name__ == "__main__":
-    # Lets you also start the app with: python app.py
     app.run(debug=True)
