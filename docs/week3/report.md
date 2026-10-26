@@ -28,8 +28,8 @@
    ![Join Queue Form on Phone](wireframes/join_queue_naia_expresspass_wireframe.png)  
    Used by **Ramon Santos** to join the queue on his mobile device while heading to the terminal; covers `REQ-FORM-01` (Field validation) and `REQ-ACC-01` (Responsive layout).
 
-2. **Join Queue Form — Laptop View (`wireframes/join_queue_naia_expresspass_wireframe.png`)**  
-   ![Join Queue Form on Laptop](wireframes/join_queue_naia_expresspass_wireframe.png)  
+2. **Join Queue Form — Laptop View (`wireframes/join_queue_desktop_portal_wireframe.png`)**  
+   ![Join Queue Form on Laptop](wireframes/join_queue_desktop_portal_wireframe.png)  
    Used by **Ramon Santos** or airport kiosks to complete pre-registration on desktop viewports; covers `REQ-FORM-01` (Field validation) and `REQ-FORM-02` (Server-side error state preservation).
 
 3. **My Place Ticket View — Phone View (`wireframes/my_ticket_queue_status_wireframe.png`)**  
@@ -37,11 +37,11 @@
    Used by **Ramon Santos** to keep track of his ticket number `#4` and live waiting count on his phone; covers `REQ-QUEUE-01` (Live position tracking) and `REQ-QUEUE-02` (Real-time JS polling).
 
 4. **My Place Ticket View — Laptop View (`wireframes/my_ticket_desktop_status_wireframe.png`)**  
-   ![My Place Ticket on Laptop](wireframes/my_ticket_desktop_status_wireframe.png.png)  
+   ![My Place Ticket on Laptop](wireframes/my_ticket_desktop_status_wireframe.png)  
    Used by **Ramon Santos** on a tablet or laptop while waiting in terminal seating areas; covers `REQ-QUEUE-01` (Live position tracking) and `REQ-NAV-01` (Navigation linkage).
 
 5. **Staff Dashboard — Phone View (`wireframes/staff_counter_4_dashboard_wireframe.png`)**  
-   ![Staff Dashboard on Phone](wireframes/staff_counter_4_dashboard_wireframestaff-phone.png)  
+   ![Staff Dashboard on Phone](wireframes/staff_counter_4_dashboard_wireframe.png)  
    Used by **Bea Bee** on a mobile terminal device to manage active baggage queues; covers `REQ-STAFF-01` (1-click status actions) and `REQ-ACC-02` (Mobile touch targets).
 
 6. **Staff Dashboard — Laptop View (`wireframes/staff_counter_portal_desktop_dashboard_wireframe.png`)**  
