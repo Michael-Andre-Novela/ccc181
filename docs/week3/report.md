@@ -4,15 +4,14 @@
 * **App Name:** NAIA ExpressPass (NAIA Terminal 3 Baggage Drop Queue System)
 * **Setting:** NAIA Terminal 3 Departures Hall (Baggage Drop Counters)
 * **Full Name:** Michael Andre L. Novela
-* **Student ID:** 2022-XXXX
-* **Section:** BSCS CS3B
+* **Student ID:** 2024-1328
+* **Section:** BSCS-CS3B
 * **Date:** October 26, 2026
-* **Pull Request Link:** [Pull Request #1 — Week 3 Interface & Implementation](https://github.com/your-username/my-app/pull/1)
+* **Pull Request Link:**(https://github.com/Michael-Andre-Novela/ccc181/pull/2)
 
 ---
 
 ## Personas
-A detailed breakdown of user requirements is available in [docs/week3/personas.md](../week3/personas.md).
 
 1. **Ramon Santos (The Passenger)**
    - *Quote:* *"I just want to drop my checked bags without standing in a 40-minute line before security."*
@@ -25,28 +24,28 @@ A detailed breakdown of user requirements is available in [docs/week3/personas.m
 
 ## Screens
 
-1. **Join Queue Form — Phone View (`screenshots/join_queue_naia_expresspass_wireframe.png`)**  
-   ![Join Queue Form on Phone](screenshots/join_queue_naia_expresspass_wireframe.png)  
+1. **Join Queue Form — Phone View (`wireframes/join_queue_naia_expresspass_wireframe.png`)**  
+   ![Join Queue Form on Phone](wireframes/join_queue_naia_expresspass_wireframe.png)  
    Used by **Ramon Santos** to join the queue on his mobile device while heading to the terminal; covers `REQ-FORM-01` (Field validation) and `REQ-ACC-01` (Responsive layout).
 
-2. **Join Queue Form — Laptop View (`screenshots/join_queue_naia_expresspass_wireframe.png`)**  
-   ![Join Queue Form on Laptop](screenshots/join_queue_naia_expresspass_wireframe.png)  
+2. **Join Queue Form — Laptop View (`wireframes/join_queue_naia_expresspass_wireframe.png`)**  
+   ![Join Queue Form on Laptop](wireframes/join_queue_naia_expresspass_wireframe.png)  
    Used by **Ramon Santos** or airport kiosks to complete pre-registration on desktop viewports; covers `REQ-FORM-01` (Field validation) and `REQ-FORM-02` (Server-side error state preservation).
 
-3. **My Place Ticket View — Phone View (`screenshots/my_ticket_queue_status_wireframe.png`)**  
-   ![My Place Ticket on Phone](screenshots/my_ticket_queue_status_wireframe.png)  
+3. **My Place Ticket View — Phone View (`wireframes/my_ticket_queue_status_wireframe.png`)**  
+   ![My Place Ticket on Phone](wireframes/my_ticket_queue_status_wireframe.png)  
    Used by **Ramon Santos** to keep track of his ticket number `#4` and live waiting count on his phone; covers `REQ-QUEUE-01` (Live position tracking) and `REQ-QUEUE-02` (Real-time JS polling).
 
-4. **My Place Ticket View — Laptop View (`screenshots/my_ticket_desktop_status_wireframe.png`)**  
-   ![My Place Ticket on Laptop](screenshots/my_ticket_desktop_status_wireframe.png.png)  
+4. **My Place Ticket View — Laptop View (`wireframes/my_ticket_desktop_status_wireframe.png`)**  
+   ![My Place Ticket on Laptop](wireframes/my_ticket_desktop_status_wireframe.png.png)  
    Used by **Ramon Santos** on a tablet or laptop while waiting in terminal seating areas; covers `REQ-QUEUE-01` (Live position tracking) and `REQ-NAV-01` (Navigation linkage).
 
-5. **Staff Dashboard — Phone View (`screenshots/staff_counter_4_dashboard_wireframe.png`)**  
-   ![Staff Dashboard on Phone](screenshots/staff_counter_4_dashboard_wireframestaff-phone.png)  
+5. **Staff Dashboard — Phone View (`wireframes/staff_counter_4_dashboard_wireframe.png`)**  
+   ![Staff Dashboard on Phone](wireframes/staff_counter_4_dashboard_wireframestaff-phone.png)  
    Used by **Bea Bee** on a mobile terminal device to manage active baggage queues; covers `REQ-STAFF-01` (1-click status actions) and `REQ-ACC-02` (Mobile touch targets).
 
-6. **Staff Dashboard — Laptop View (`screenshots/staff_counter_portal_desktop_dashboard_wireframe.png`)**  
-   ![Staff Dashboard on Laptop](screenshots/staff_counter_portal_desktop_dashboard_wireframe.png)  
+6. **Staff Dashboard — Laptop View (`wireframes/staff_counter_portal_desktop_dashboard_wireframe.png`)**  
+   ![Staff Dashboard on Laptop](wireframes/staff_counter_portal_desktop_dashboard_wireframe.png)  
    Used by **Bea Bee** at the Counter 4 desktop workstation to monitor overall lane backlogs and call next passengers; covers `REQ-STAFF-01` (Counter actions) and `REQ-STAFF-02` (Lane filtering).
 
 ---
@@ -85,13 +84,13 @@ Based on feedback logged in [docs/week3/feedback.md](../week3/feedback.md):
 
 ## Usability test
 
-* **Task Execution Results (Tester: Raven Joy Avenido, 3rd-year IT student):**
+* **Task Execution Results (Tester: Aveni, 3rd-year IT student):**
   - **Task 1 (Join Queue):** Completed in ~18s (Unassisted). *"Nakalagay pala na 6 characters yung PNR reference! At least alam ko agad kung anong code kukunin sa flight email ko, diba?"*
   - **Task 2 (Check Position & Ticket Number):** Completed in ~4s (Unassisted). *"laki ng ticket number! Hindi mamiss kahit nagmamadali kang maglakad sa terminal."*
   - **Task 3 (Call & Serve Passenger as Staff):** Completed in ~22s (With minor navigation hesitation). *"clear ng 'Call Next' button sa taas! Pero try mo din maglagay ng direct staff link sa footer or navbar para hindi na kailangan bumalik sa home page to test."*
 
 * **One Key Improvement Made:**  
-  During testing, Raven Joy Avenido experienced friction transitioning from the passenger ticket screen back to counter operations. We added a persistent **Staff Portal Quick Link** in the global site footer (`templates/base.html`) for direct 1-click navigation.
+  During testing, Aveni experienced friction transitioning from the passenger ticket screen back to counter operations. We added a persistent **Staff Portal Quick Link** in the global site footer (`templates/base.html`) for direct 1-click navigation.
   
   ![Usability Before](screenshots/usability-before.png)  
   *Before: The global footer on inner screens contained only static text, requiring users to navigate back to the homepage to access staff tools.*
