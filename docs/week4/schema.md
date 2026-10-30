@@ -52,7 +52,8 @@ Starting from the three tables in the template, the tables are adapted to fit th
 | --- | --- |
 | `users` | id, name, email, role |
 | `services` | id, name, avg_minutes, is_active |
-| `tickets` | id, user_id, service_id, flight_number, pnr, bag_count, preferred_slot_at, status, created_at, called_at |
+| `tickets` | id, user_id, service_id, flight_number, pnr, bag_count,
+preferred_slot_at, priority_verified, status, created_at, called_at |
 
 The schema uses **three related tables**:
 
@@ -88,6 +89,7 @@ A separate table for the **queue** is not needed. The queue can be determined fr
 | `tickets` | `status` | `varchar(20)` | `NOT NULL CHECK (status IN ('waiting', 'called', 'served', 'no-show', 'left'))` | Prevents invalid ticket states. |
 | `tickets` | `created_at` | `timestamptz` | `NOT NULL DEFAULT now()` | Records when the passenger joined using a timezone-safe timestamp. |
 | `tickets` | `called_at` | `timestamptz` | Nullable | Filled only when staff call the passenger. |
+| `tickets` | `priority_verified` | `boolean` | `NOT NULL DEFAULT FALSE` | Records whether staff verified the passenger's Priority Lane eligibility. |
 
 ### Constraint coverage
 
