@@ -1,9 +1,25 @@
-"""CCC181 Week 3: NAIA ExpressPass Queue Management System"""
+"""CCC181 Week 4: NAIA ExpressPass Queue Management System"""
 
-from flask import Flask, abort, flash, jsonify, redirect, render_template, request, url_for
+import os
+
+from dotenv import load_dotenv
+from flask import Flask, abort, flash, redirect, render_template, request, url_for
+from flask_migrate import Migrate
+from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
+
+from models import Service, Ticket, User, db
+
+
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = "dev-only-change-me"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
+app.config["SQLALCHEMY_ECHO"] = os.environ.get("SQLALCHEMY_ECHO") == "1"
+
+db.init_app(app)
+migrate = Migrate(app, db)
 
 SERVICES = [
     {"id": 1, "name": "Virtual Slot Drop-off (Pre-booked)"},
