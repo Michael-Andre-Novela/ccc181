@@ -19,8 +19,14 @@
         <!-- Call Next Button -->
         <div>
           <form method="post"
-                action="{{ url_for('call_next', service_id=selected) }}"
-                class="d-inline">
+      action="{{ url_for('call_next') }}"
+      class="d-inline">
+
+  {% if selected %}
+    <input type="hidden"
+           name="service_id"
+           value="{{ selected }}">
+  {% endif %}
             <button type="submit"
                     class="btn btn-warning btn-lg fw-bold px-4"
                     aria-label="Call the next waiting passenger">
@@ -146,7 +152,15 @@
               No-show
             </button>
           </form>
-
+          <form method="post"
+              action="{{ url_for('delete_ticket', ticket_id=t.id) }}"
+              data-confirm="Delete ticket #{{ t.id }}? This cannot be undone."
+              class="flex-fill">
+          <button type="submit"
+                  class="btn btn-outline-dark w-100 py-2 fw-semibold">
+            Delete
+          </button>
+</form>
         </div>
       </div>
 
@@ -275,7 +289,15 @@
                           No-show
                         </button>
                       </form>
-
+                        <form method="post"
+                              action="{{ url_for('delete_ticket', ticket_id=t.id) }}"
+                              data-confirm="Delete ticket #{{ t.id }}? This cannot be undone."
+                              class="d-inline">
+                          <button type="submit"
+                                  class="btn btn-sm btn-outline-dark">
+                            Delete
+                          </button>
+                        </form>
                     </div>
                   </td>
 

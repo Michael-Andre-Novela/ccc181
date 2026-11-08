@@ -47,7 +47,7 @@ class Service(db.Model):
         default=10,
         server_default="10",
     )
-    is_active: Mapped[bool] = mapped_column(
+    active: Mapped[bool] = mapped_column(
         Boolean,
         default=True,
         server_default=true(),

@@ -115,11 +115,11 @@
     </div>
 
     <!-- Leave Queue Form -->
-    <form method="post" action="{{ url_for('leave_queue', ticket_id=ticket.id) }}">
+    <form method="post" action="{{ url_for('leave', ticket_id=ticket.id) }}">
       <button type="submit" class="btn btn-outline-danger w-100 py-2 rounded-3">
         Leave the queue
       </button>
-    </form>
+    </form> 
 
   </div>
 </div>
