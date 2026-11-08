@@ -216,6 +216,26 @@ def staff_action(ticket_id, action):
     service_id = request.args.get("service_id", type=int)
     return redirect(url_for("staff_dashboard", service_id=service_id if service_id else None))
 
+@app.cli.command("seed")
+def seed():
+    """Add the starting services if they are not there yet."""
+    starting = [
+        ("Virtual Slot Drop-off (Pre-booked)", 10),
+        ("Priority Lane (OFW / Senior / PWD / Infant)", 10),
+        ("Standby / Walk-in Bag Drop", 10),
+    ]
 
+    for name, minutes in starting:
+        exists = db.session.scalar(
+            db.select(Service).filter_by(name=name)
+        )
+        if exists is None:
+            db.session.add(
+                Service(name=name, avg_minutes=minutes)
+            )
+
+    db.session.commit()
+    print("Services are ready.")
+    
 if __name__ == "__main__":
     app.run(debug=True)
