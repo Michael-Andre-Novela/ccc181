@@ -2,6 +2,7 @@
 
 import os
 
+from datetime import datetime
 from dotenv import load_dotenv
 from flask import Flask, abort, flash, redirect, render_template, request, url_for
 from flask_migrate import Migrate
@@ -21,47 +22,6 @@ app.config["SQLALCHEMY_ECHO"] = os.environ.get("SQLALCHEMY_ECHO") == "1"
 db.init_app(app)
 migrate = Migrate(app, db)
 
-SERVICES = [
-    {"id": 1, "name": "Virtual Slot Drop-off (Pre-booked)"},
-    {"id": 2, "name": "Priority Lane (OFW / Senior / PWD / Infant)"},
-    {"id": 3, "name": "Standby / Walk-in Bag Drop"},
-]
-
-TICKETS = [
-    {
-        "number": 1,
-        "name": "Ramon Santos",
-        "email": "ramon.santos@gmail.com",
-        "service_id": 1,
-        "flight_number": "5J-501",
-        "pnr": "X7K9LP",
-        "num_bags": 2,
-        "slot_time": "14:15 - 14:30",
-        "status": "waiting",
-    },
-    {
-        "number": 2,
-        "name": "Maria Clara Reyes",
-        "email": "m.reyes@yahoo.com",
-        "service_id": 2,
-        "flight_number": "PR-1845",
-        "pnr": "A2B3C4",
-        "num_bags": 1,
-        "slot_time": "14:15 - 14:30",
-        "status": "waiting",
-    },
-    {
-        "number": 3,
-        "name": "Juan Dela Cruz",
-        "email": "juan.delacruz@outlook.com",
-        "service_id": 3,
-        "flight_number": "Z2-763",
-        "pnr": "Q9W8E7",
-        "num_bags": 3,
-        "slot_time": "Walk-in",
-        "status": "called",
-    },
-]
 
 
 @app.route("/")
@@ -69,56 +29,123 @@ def index():
     return render_template("index.html")
 
 
+def all_services():
+    return db.session.scalars(
+        db.select(Service).order_by(Service.name)
+    ).all()
+
+
 @app.get("/join")
 def join_form():
-    return render_template("join.html", services=SERVICES, form={}, errors={})
+    return render_template(
+        "join.html",
+        services=all_services(),
+        form={},
+        errors={}
+    )
 
 
 @app.post("/join")
 def join():
     form = request.form
+
     name = form.get("name", "").strip()
     email = form.get("email", "").strip().lower()
     flight_number = form.get("flight_number", "").strip().upper()
     pnr = form.get("pnr", "").strip().upper()
     num_bags = form.get("num_bags", type=int)
     service_id = form.get("service_id", type=int)
-    slot_time = form.get("slot_time", "14:15 - 14:30").strip()
+    slot_time = form.get("slot_time", "").strip()
+
+    service = db.session.get(Service, service_id) if service_id else None
 
     errors = {}
-    if not name:
+
+    if not name or len(name) > 120:
         errors["name"] = "Enter your full name."
-    if "@" not in email or "." not in email:
+
+    if "@" not in email or "." not in email or len(email) > 120:
         errors["email"] = "Enter a valid email address."
-    if not flight_number:
+
+    if not flight_number or len(flight_number) > 12:
         errors["flight_number"] = "Enter your flight number (e.g., 5J-501)."
+
     if not pnr or len(pnr) != 6:
         errors["pnr"] = "Booking reference (PNR) must be exactly 6 characters."
+
     if not num_bags or num_bags < 1 or num_bags > 5:
         errors["num_bags"] = "Specify between 1 and 5 bags."
-    if service_id not in [s["id"] for s in SERVICES]:
+
+    if service is None:
         errors["service_id"] = "Choose a service lane."
+
+    slot_starts = {
+        "14:15 - 14:30": "14:15",
+        "14:30 - 14:45": "14:30",
+        "14:45 - 15:00": "14:45",
+    }
+
+    if slot_time not in slot_starts:
+        errors["slot_time"] = "Choose a valid preferred slot."
 
     if errors:
         flash("Please fix the highlighted fields.", "danger")
-        return render_template("join.html", services=SERVICES, form=form, errors=errors), 400
+        return render_template(
+            "join.html",
+            services=all_services(),
+            form=form,
+            errors=errors
+        ), 400
 
-    number = TICKETS[-1]["number"] + 1 if TICKETS else 1
-    TICKETS.append(
-        {
-            "number": number,
-            "name": name,
-            "email": email,
-            "service_id": service_id,
-            "flight_number": flight_number,
-            "pnr": pnr,
-            "num_bags": num_bags,
-            "slot_time": slot_time,
-            "status": "waiting",
-        }
+    preferred_slot_at = datetime.strptime(
+        f"{datetime.now().date()} {slot_starts[slot_time]}",
+        "%Y-%m-%d %H:%M"
     )
-    flash(f"You joined the queue. Your ticket is #{number}.", "success")
-    return redirect(url_for("ticket", ticket_id=number))
+
+    user = db.session.scalar(
+        db.select(User).filter_by(email=email)
+    )
+
+    if user is None:
+        user = User(
+            name=name,
+            email=email
+        )
+
+    ticket = Ticket(
+        user=user,
+        service=service,
+        flight_number=flight_number,
+        pnr=pnr,
+        bag_count=num_bags,
+        preferred_slot_at=preferred_slot_at,
+    )
+
+    db.session.add(ticket)
+
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        flash(
+            "Something went wrong saving your ticket. Please try again.",
+            "danger"
+        )
+        return render_template(
+            "join.html",
+            services=all_services(),
+            form=form,
+            errors={}
+        ), 409
+
+    flash(
+        f"You joined the queue. Your ticket is #{ticket.id}.",
+        "success"
+    )
+
+    return redirect(
+        url_for("ticket", ticket_id=ticket.id)
+    )
 
 
 @app.get("/queue/<int:ticket_id>")
