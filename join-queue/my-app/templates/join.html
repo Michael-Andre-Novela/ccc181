@@ -7,12 +7,12 @@
     <h1 class="h3 mb-1">Join the Bag Drop Queue</h1>
     <p class="text-secondary small mb-4">NAIA Terminal 3 — Departure Hall</p>
 
-    <form method="post" action="{{ url_for('join') }}" novalidate id="join-form">
+    <form method="post" action="{{ url_for('join') }}" id="join-form">
       
       <!-- Name -->
       <div class="mb-3">
         <label for="name" class="form-label">Full name</label>
-        <input id="name" name="name" type="text" autocomplete="name" required
+        <input id="name" name="name" type="text" autocomplete="name" required maxlength="120"
                class="form-control {% if errors and errors.name %}is-invalid{% endif %}"
                value="{{ form.get('name', '') }}"
                {% if errors and errors.name %}aria-describedby="name-error"{% endif %}>
@@ -24,7 +24,7 @@
       <!-- Email -->
       <div class="mb-3">
         <label for="email" class="form-label">Email address</label>
-        <input id="email" name="email" type="email" autocomplete="email" required
+        <input id="email" name="email" type="email" autocomplete="email" required maxlength="120"
                class="form-control {% if errors and errors.email %}is-invalid{% endif %}"
                value="{{ form.get('email', '') }}"
                {% if errors and errors.email %}aria-describedby="email-error"{% endif %}>
@@ -37,7 +37,7 @@
       <div class="row g-2 mb-3">
         <div class="col-6">
           <label for="flight_number" class="form-label">Flight number</label>
-          <input id="flight_number" name="flight_number" type="text" placeholder="e.g., 5J-501" required
+          <input id="flight_number" name="flight_number" type="text" placeholder="e.g., 5J-501" required maxlength="12"
                  class="form-control {% if errors and errors.flight_number %}is-invalid{% endif %}"
                  value="{{ form.get('flight_number', '') }}"
                  {% if errors and errors.flight_number %}aria-describedby="flight-error"{% endif %}>
@@ -47,7 +47,7 @@
         </div>
         <div class="col-6">
           <label for="pnr" class="form-label">Booking ref (PNR)</label>
-          <input id="pnr" name="pnr" type="text" placeholder="6 chars" required maxlength="6"
+          <input id="pnr" name="pnr" type="text" placeholder="6 chars" required minlength="6" maxlength="6"
                  class="form-control {% if errors and errors.pnr %}is-invalid{% endif %}"
                  value="{{ form.get('pnr', '') }}"
                  {% if errors and errors.pnr %}aria-describedby="pnr-error"{% endif %}>
@@ -89,7 +89,7 @@
       <!-- Preferred Slot Window -->
       <div class="mb-4">
         <label for="slot_time" class="form-label">Preferred slot window</label>
-        <select id="slot_time" name="slot_time" class="form-select">
+        <select id="slot_time" name="slot_time" class="form-select" required>
           <option value="14:15 - 14:30" {% if form.get('slot_time') == '14:15 - 14:30' %}selected{% endif %}>14:15 - 14:30 (Estimated wait: 2 mins)</option>
           <option value="14:30 - 14:45" {% if form.get('slot_time') == '14:30 - 14:45' %}selected{% endif %}>14:30 - 14:45 (Estimated wait: 5 mins)</option>
           <option value="14:45 - 15:00" {% if form.get('slot_time') == '14:45 - 15:00' %}selected{% endif %}>14:45 - 15:00 (Estimated wait: 10 mins)</option>
