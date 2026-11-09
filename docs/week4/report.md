@@ -6,7 +6,7 @@
 **Student ID:** 2024-1328  
 **Section:** CS-3B  
 **Date:** November 9, 2026  
-**Pull Request:** 
+**Pull Request:** https://github.com/Michael-Andre-Novela/ccc181/pull/5
 
 ## 1. Requirements
 
