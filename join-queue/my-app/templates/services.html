@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Services · NAIA ExpressPass{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-1">Manage Services</h1>
+      <p class="text-muted mb-0">
+        Manage baggage drop services and estimated processing times.
+      </p>
+    </div>
+
+    <a href="{{ url_for('staff_dashboard') }}"
+       class="btn btn-outline-secondary">
+      Back to Dashboard
+    </a>
+  </div>
+
+
+  <!-- Add Service -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+
+      <h2 class="h5 mb-3">Add Service</h2>
+
+      <form method="post"
+            action="{{ url_for('service_create') }}"
+            class="row g-3">
+
+        <div class="col-md-8">
+          <label for="name" class="form-label">
+            Service Name
+          </label>
+
+          <input type="text"
+                 class="form-control"
+                 id="name"
+                 name="name"
+                 maxlength="60"
+                 required>
+        </div>
+
+        <div class="col-md-4">
+          <label for="avg_minutes" class="form-label">
+            Average Minutes
+          </label>
+
+          <input type="number"
+                 class="form-control"
+                 id="avg_minutes"
+                 name="avg_minutes"
+                 min="1"
+                 required>
+        </div>
+
+        <div class="col-12">
+          <button type="submit"
+                  class="btn btn-primary">
+            Add Service
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+
+  <!-- Existing Services -->
+  <div class="card shadow-sm border-0">
+    <div class="card-body">
+
+      <h2 class="h5 mb-3">Existing Services</h2>
+
+      <div class="table-responsive">
+
+        <table class="table align-middle">
+
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Avg. Minutes</th>
+              <th>Status</th>
+              <th>Tickets</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            {% for s in services %}
+
+              <tr>
+
+                <!-- Service Name -->
+                <td>
+                  {{ s.name }}
+                </td>
+
+                <!-- Average Minutes -->
+                <td>
+                  {{ s.avg_minutes }}
+                </td>
+
+                <!-- Active Status -->
+                <td>
+                  {% if s.active %}
+                    <span class="badge text-bg-success">
+                      Active
+                    </span>
+                  {% else %}
+                    <span class="badge text-bg-secondary">
+                      Inactive
+                    </span>
+                  {% endif %}
+                </td>
+
+                <!-- Ticket Count -->
+                <td>
+                  {{ s.tickets|length }}
+                </td>
+
+                <!-- Actions -->
+                <td>
+
+                  <!-- Update Service -->
+                  <form method="post"
+                        action="{{ url_for('service_edit', service_id=s.id) }}"
+                        class="row g-2 align-items-center mb-2">
+
+                    <div class="col-lg-5">
+
+                      <input type="text"
+                             name="name"
+                             value="{{ s.name }}"
+                             maxlength="60"
+                             class="form-control form-control-sm"
+                             aria-label="Service name"
+                             required>
+
+                    </div>
+
+                    <div class="col-lg-2">
+
+                      <input type="number"
+                             name="avg_minutes"
+                             value="{{ s.avg_minutes }}"
+                             min="1"
+                             class="form-control form-control-sm"
+                             aria-label="Average minutes"
+                             required>
+
+                    </div>
+
+                    <div class="col-lg-3">
+
+                      <div class="form-check">
+
+                        <input type="checkbox"
+                               name="active"
+                               class="form-check-input"
+                               id="active-{{ s.id }}"
+                               {% if s.active %}checked{% endif %}>
+
+                        <label class="form-check-label"
+                               for="active-{{ s.id }}">
+                          Active
+                        </label>
+
+                      </div>
+
+                    </div>
+
+                    <div class="col-lg-2">
+
+                      <button type="submit"
+                              class="btn btn-sm btn-primary w-100">
+                        Update
+                      </button>
+
+                    </div>
+
+                  </form>
+
+
+                  <!-- Delete Service -->
+                  <form method="post"
+                        action="{{ url_for('service_delete', service_id=s.id) }}"
+                        data-confirm="Delete service '{{ s.name }}'? This cannot be undone.">
+
+                    <button type="submit"
+                            class="btn btn-sm btn-outline-danger">
+                      Delete
+                    </button>
+
+                  </form>
+
+                </td>
+
+              </tr>
+
+            {% else %}
+
+              <tr>
+                <td colspan="5"
+                    class="text-center text-muted py-4">
+                  No services found.
+                </td>
+              </tr>
+
+            {% endfor %}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}
