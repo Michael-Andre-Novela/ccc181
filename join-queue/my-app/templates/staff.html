@@ -16,27 +16,31 @@
           </span>
         </div>
 
-        <!-- Call Next Button -->
-        <div>
-          <form method="post"
-      action="{{ url_for('call_next') }}"
-      class="d-inline">
+        <!-- Staff Controls -->
+<div class="d-flex gap-2">
+  <a href="{{ url_for('services_list') }}"
+     class="btn btn-outline-light btn-lg fw-semibold">
+    Manage Services
+  </a>
 
-  {% if selected %}
-    <input type="hidden"
-           name="service_id"
-           value="{{ selected }}">
-  {% endif %}
-            <button type="submit"
-                    class="btn btn-warning btn-lg fw-bold px-4"
-                    aria-label="Call the next waiting passenger">
-              <i class="bi bi-megaphone-fill me-2"></i>
-              Call next
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
+  <form method="post"
+        action="{{ url_for('call_next') }}"
+        class="d-inline">
+
+    {% if selected %}
+      <input type="hidden"
+             name="service_id"
+             value="{{ selected }}">
+    {% endif %}
+
+    <button type="submit"
+            class="btn btn-warning btn-lg fw-bold px-4"
+            aria-label="Call the next waiting passenger">
+      <i class="bi bi-megaphone-fill me-2"></i>
+      Call next
+    </button>
+  </form>
+</div>
   </div>
 
 

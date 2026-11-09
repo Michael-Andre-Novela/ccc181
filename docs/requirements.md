@@ -31,14 +31,14 @@ The Week 3 [usability test](week3/usability-test.md) showed that the basic passe
 | FR-04 ★ | A passenger can enter a preferred baggage drop-off time window and view it on their ticket. | Must | Yes | Built (Week 3) |
 | FR-05 | A passenger can view their ticket number, queue status, selected lane, and number of waiting passengers ahead. | Must | Yes | Built (Week 3) |
 | FR-06 | A passenger can receive updated queue status and position information without manually reloading the ticket page. | Must | Yes | Built (Week 3) |
-| FR-07 | A passenger can leave the queue while retaining the ticket record with a distinct `left` status. | Must | Yes | This week |
+| FR-07 | A passenger can leave the queue while retaining the ticket record with a distinct `left` status. | Must | Yes | Built (Week 4) |
 | FR-08 | A ground staff member can view active queue tickets and filter them by service lane. | Must | Yes | Built (Week 3) |
 | FR-09 | A ground staff member can call the next waiting passenger in a selected lane and change the ticket status to `called`. | Must | Yes | Built (Week 3) |
 | FR-10 | A ground staff member can mark a passenger ticket as `served` or `no-show`. | Must | Yes | Built (Week 3) |
 | FR-11 ★ | A ground staff member can view a queued passenger's flight number, PNR, number of bags, and preferred slot window. | Must | Yes | Built (Week 3) |
-| FR-12 | A ground staff member can create a service lane, update its name and average service time, and deactivate it for new queue entries. | Must | Yes | This week |
-| FR-13 | A ground staff member can permanently delete an incorrectly created ticket after confirming the action. | Must | Yes | This week |
-| FR-14 | A ground staff member can delete a service lane only when no tickets reference that lane. | Must | Yes | This week |
+| FR-12 | A ground staff member can create a service lane, update its name and average service time, and deactivate it for new queue entries. | Must | Yes | Built (Week 4) |
+| FR-13 | A ground staff member can permanently delete an incorrectly created ticket after confirming the action. | Must | Yes | Built (Week 4) |
+| FR-14 | A ground staff member can delete a service lane only when no tickets reference that lane. | Must | Yes | Built (Week 4) |
 | FR-15 | A ground staff member can view daily counts of passengers who left the queue before being served, grouped by lane. | Should | Yes | Later |
 | FR-16 ★ | A passenger can reserve a confirmed baggage drop-off slot only when the selected time window has available capacity. | Could | Yes | Later |
 | FR-17 ★ | A ground staff member can verify a passenger's eligibility for priority-lane service. | Could | Yes | Later |
